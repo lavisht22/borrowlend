@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt');
 
 var Schema = mongoose.Schema;
 
-var User = mongoose.model('User', new Schema({
+var user = mongoose.model('User', new Schema({
     firstName: {
         type: String,
         required: [true, 'First Name is Required']
@@ -34,4 +34,28 @@ var User = mongoose.model('User', new Schema({
     }
 }));
 
-module.exports = User;
+var creditRequest = mongoose.model('CreditRequest', new Schema({
+    requestedBy:{
+        type: Object,
+        required: true
+    },
+    requestedAt: {
+        type: Date,
+        default: Date.now()
+    },
+    amount: {
+        type: Number,
+        required: [true, 'Amount is Required']
+    },
+    repaymentDate: {
+        type: Date,
+        required: [true, 'Repayment Date is Required']
+    },
+    isRepaymentDone: {
+        type: Boolean,
+        default: false
+    }
+}));
+
+module.exports.User = user;
+module.exports.CreditRequest = creditRequest;

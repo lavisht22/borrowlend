@@ -1,7 +1,7 @@
 var passport = require('passport');
 var passportJWT = require('passport-jwt');
 var jwt = require('jsonwebtoken');
-var User = require('./model')
+var User = require('./model').User;
 
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -11,7 +11,9 @@ module.exports = function(passport){
     var opts = {};
     opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
     opts.secretOrKey = 'cashpositivesecretkey';
-    var lenderStrategy = new JwtStrategy(opts, function(jwt_payload, done) {
+    opts.passReqToCallback = true;
+
+    var lenderStrategy = new JwtStrategy(opts, function(req, jwt_payload, done) {
         User.findOne({email: jwt_payload.email}, function(err, user) {
             if (err) {
                 return done(err, false);
@@ -29,7 +31,7 @@ module.exports = function(passport){
         });
     });
 
-    var borrowerStrategy = new JwtStrategy(opts, function(jwt_payload, done) {
+    var borrowerStrategy = new JwtStrategy(opts, function(req, jwt_payload, done) {
         User.findOne({email: jwt_payload.email}, function(err, user) {
             if (err) {
                 return done(err, false);

@@ -49,7 +49,8 @@ var creditRequest = mongoose.model('CreditRequest', new Schema({
     },
     amount: {
         type: Number,
-        required: [true, 'Amount is Required']
+        required: [true, 'Amount is Required'],
+        min: [1, 'Amount Should be positive!']
     },
     repaymentDate: {
         type: Date,

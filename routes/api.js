@@ -9,26 +9,32 @@ var User = require('../config/model').User;
 router.post('/borrower/createrequest', passport.authenticate('borrower-jwt', { session: false }), function(req, res) {
     var amount = req.body.amount;
     var repaymentDate = req.body.repaymentdate;
+  var newLimit = req.user.creditLimit - amount;
+  if(newLimit > 0) {
     var request = new CreditRequest();
-    request.requestedBy = {name: req.user.firstName + " " + req.user.lastName, email: req.user.email};
+    request.requestedBy = { name: req.user.firstName + " " + req.user.lastName, email: req.user.email };
     request.amount = req.body.amount;
-    request.repaymentDate = dateFromString(repaymentDate);
-    request.save(function(err){
-        if(err){
-            res.status(500).json(err);
-        }
-        else{
-            var newLimit = req.user.creditLimit - amount;
-            User.findOneAndUpdate({'email': req.user.email}, {creditLimit: newLimit}, function(err, data){
-                if(err){
-                    res.status(500).json(err);
-                }
-                else{
-                    res.status(200).json({'message': "Request Submitted Successfully!"});
-                }
-            });
-        }
-    });
+    request.repaymentDate = dateFromString( repaymentDate );
+    request.save( function (err) {
+      if (err) {
+        res.status( 500 ).json( err );
+      }
+      else {
+          User.findOneAndUpdate( { 'email': req.user.email }, { creditLimit: newLimit }, function (err, data) {
+          if (err) {
+            res.status( 500 ).json( err.message );
+          }
+          else {
+            res.status( 200 ).json( { 'message': "Request Submitted Successfully!" } );
+          }
+        });
+      }
+    } );
+  }
+  else
+  {
+    res.status( 500 ).json( { 'message': "Limit Exhausted!" } );
+  }
 });
 
 /* route to view all the requests submitted by the user */
@@ -76,12 +82,34 @@ router.get('/lender/viewborrowers', passport.authenticate('lender-jwt', {session
 router.put('/lender/payment', passport.authenticate('lender-jwt', {session: false}), function(req, res){
     var id = req.body.id;
     if(id){
-        CreditRequest.findOneAndUpdate({'_id':id}, {'isRepaymentDone':true}, function(err){
+        CreditRequest.findOne({'_id': id}, function(err, data){
             if(err){
                 res.status(500).json(err);
             }
             else{
-                res.status(200).json({'message': "Record Updated Successfully!"});
+                if(data.isRepaymentDone == true){
+                    res.status(401).json({'message': "Repayment is already done!"});
+                }else{
+                  CreditRequest.findOneAndUpdate({'_id':id}, {'isRepaymentDone':true}, function(err, data){
+                    if(err){
+                      res.status(500).json(err);
+                    }
+                    else{
+                      User.findOne({'email': data.requestedBy.email}, function(err, doc){
+                        var newLimit = doc.creditLimit + data.amount;
+                        console.log(newLimit);
+                        User.findOneAndUpdate({'email': data.requestedBy.email}, {creditLimit: newLimit}, function(err){
+                          if(err){
+                            res.status(500).json(err);
+                          }
+                          else{
+                            res.status(200).json({'message': "Record Updated Successfully!"});
+                          }
+                        });
+                      });
+                    }
+                  });
+                }
             }
         });
     }
@@ -97,6 +125,7 @@ function dateFromString(str){
     var yr   = parseInt(str.substring(6,10));
     var date = new Date(yr, mon-1, dt+1);
     return date;
+
 }
 
 module.exports = router;

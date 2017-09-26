@@ -1,8 +1,11 @@
+/* Mongoose Models Configuration File */
+
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
 var Schema = mongoose.Schema;
 
+/* User Model */
 var user = mongoose.model('User', new Schema({
     firstName: {
         type: String,
@@ -34,6 +37,7 @@ var user = mongoose.model('User', new Schema({
     }
 }));
 
+/*C reditRequest Model */
 var creditRequest = mongoose.model('CreditRequest', new Schema({
     requestedBy:{
         type: Object,

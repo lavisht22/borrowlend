@@ -9,6 +9,7 @@ var passport = require('passport');
 
 require('./config/passport')(passport);
 
+/* Mongoose Setup */
 var dbconfig = require('./config/database');
 mongoose.Promise = require('bluebird');
 mongoose.connect(dbconfig.url);

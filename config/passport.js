@@ -1,3 +1,5 @@
+/* passport configuration file */
+
 var passport = require('passport');
 var passportJWT = require('passport-jwt');
 var jwt = require('jsonwebtoken');
@@ -13,6 +15,7 @@ module.exports = function(passport){
     opts.secretOrKey = 'cashpositivesecretkey';
     opts.passReqToCallback = true;
 
+    /* LenderStrategy for lender routes authorization */
     var lenderStrategy = new JwtStrategy(opts, function(req, jwt_payload, done) {
         User.findOne({email: jwt_payload.email}, function(err, user) {
             if (err) {
@@ -30,6 +33,8 @@ module.exports = function(passport){
             }
         });
     });
+
+    /*BorrowerStrategy for borrower's routes */
 
     var borrowerStrategy = new JwtStrategy(opts, function(req, jwt_payload, done) {
         User.findOne({email: jwt_payload.email}, function(err, user) {

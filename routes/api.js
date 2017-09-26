@@ -5,7 +5,7 @@ var passport = require('passport')
 var CreditRequest = require('../config/model').CreditRequest;
 var User = require('../config/model').User;
 
-/* Route to get borrow requests from user */
+/* Route to create a new borrow requests for this user */
 router.post('/borrower/createrequest', passport.authenticate('borrower-jwt', { session: false }), function(req, res) {
     var amount = req.body.amount;
     var repaymentDate = req.body.repaymentdate;
@@ -43,7 +43,7 @@ router.get('/borrower/viewrequests', passport.authenticate('borrower-jwt', {sess
     });
 });
 
-
+/* route to view all the requests, can only be accessed by the lender */
 router.get('/lender/viewrequests', passport.authenticate('lender-jwt', {session: false}), function(req, res){
     CreditRequest.find(function(err, data){
         if(err){
@@ -55,6 +55,7 @@ router.get('/lender/viewrequests', passport.authenticate('lender-jwt', {session:
     });
 });
 
+/* route to get all the borrowers available in the system */
 router.get('/lender/viewborrowers', passport.authenticate('lender-jwt', {session: false}), function(req, res){
     User.find({'role':"borrower"}, function(err, data){
         if(err){
@@ -71,6 +72,7 @@ router.get('/lender/viewborrowers', passport.authenticate('lender-jwt', {session
     });
 });
 
+/* route to mark a payment as complete */
 router.put('/lender/payment', passport.authenticate('lender-jwt', {session: false}), function(req, res){
     var id = req.body.id;
     if(id){

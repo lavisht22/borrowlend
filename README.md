@@ -1,19 +1,21 @@
+# borrowlend
+
 ## Synopsis
 
 'borrowlend' is an API project that facilitates transactions between one lender and multiple borrowers. Borrowers can create their account and start making credit requests within their limit. Lender can view the requests and mark them once the repayment is done.
 
 ## END POINTS
 
-USERS
+* USERS
     POST /users/login
     POST /users/signup
 
-LENDERS
-    PUT /api/lender/payment
-    GET /api/lender/viewrequests
-    GET /api/lender/viewborrowers
+* LENDERS
+    * PUT /api/lender/payment
+    * GET /api/lender/viewrequests
+    * GET /api/lender/viewborrowers
 
-BORROWERS
+* BORROWERS
     GET /api/borrower/viewrequests
     POST /api/borrower/createrequest
 
@@ -26,10 +28,11 @@ The 'Lender' routes facilitate lenders and let them view all the requests and bo
 'Borrower' routes facilitate borrowers and let them make requests and view the requests they've previously made. To access Borrower routes, a proper JWT token must be included in the request Authorization header.
 
 ## Installation
-
+```
 git clone https://github.com/lavisht22/borrowlend.git
 npm install
 npm start
+```
 
 ## API Reference
 
